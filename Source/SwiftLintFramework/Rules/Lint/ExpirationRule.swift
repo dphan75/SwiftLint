@@ -1,22 +1,22 @@
+//
+//  ExpirationRule.swift
+//  
+//
+//  Created by David Phan on 4/21/20.
+//
+
 import Foundation
 import SourceKittenFramework
 
-public extension SyntaxKind {
-    /// Returns if the syntax kind is comment-like.
-    var isCommentLike: Bool {
-        return SyntaxKind.commentKinds.contains(self)
-    }
-}
-
-public struct TodoRule: ConfigurationProviderRule {
+public struct ExpirationRule: ConfigurationProviderRule {
     public var configuration = SeverityConfiguration(.warning)
 
     public init() {}
 
     public static let description = RuleDescription(
-        identifier: "todo",
-        name: "Todo",
-        description: "TODOs and FIXMEs should be resolved.",
+        identifier: "expiration",
+        name: "Expiration",
+        description: "Temporary and/or experimental intende to be removed at a later time",
         kind: .lint,
         nonTriggeringExamples: [
             Example("// notaTODO:\n"),
@@ -72,10 +72,10 @@ public struct TodoRule: ConfigurationProviderRule {
     }
 
     public func validate(file: SwiftLintFile) -> [StyleViolation] {
-        return file.match(pattern: "\\b(?:Expiration|Expiration)(?::|\\b)").compactMap { range, syntaxKinds in
-//            if syntaxKinds.contains(where: { !$0.isCommentLike }) {
-//                return nil
-//            }
+        return file.match(pattern: "\\b(?:Expiration|expiration)(?::|\\b)").compactMap { range, syntaxKinds in
+            if syntaxKinds.contains(where: { !$0.isCommentLike }) {
+                return nil
+            }
             let reason = customMessage(file: file, range: range)
 
             return StyleViolation(ruleDescription: type(of: self).description,
